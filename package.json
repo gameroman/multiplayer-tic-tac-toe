@@ -6,7 +6,9 @@
     "lint": "oxlint",
     "format": "oxfmt",
     "dev": "NODE_ENV=development bun run ./src/index.ts",
-    "build": "NODE_ENV=production bun build --minify --compile ./src/index.ts --outfile=dist/tictactoe --target=bun-windows-x64"
+    "build:modern": "NODE_ENV=production bun build --minify --compile ./src/index.ts --outfile=dist/tictactoe.exe --target=bun-windows-x64",
+    "build:baseline": "NODE_ENV=production bun build --minify --compile ./src/index.ts --outfile=dist/tictactoe-baseline.exe --target=bun-windows-x64-baseline-v1.3.14",
+    "build": "bun run --parallel build:modern build:baseline"
   },
   "devDependencies": {
     "@gameroman/config": "0.1.0",
