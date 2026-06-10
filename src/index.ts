@@ -1,5 +1,5 @@
-import { createInterface } from "node:readline";
 import dgram from "node:dgram";
+import { createInterface } from "node:readline";
 
 const WS_PORT = 3000;
 const UDP_PORT = 3001;
@@ -8,9 +8,9 @@ const BROADCAST_ADDR = "255.255.255.255";
 type CurrentTurn = "X" | "O";
 type PlayerType = CurrentTurn | "SPECTATOR";
 
-type BoardSymbol = string;
-type BoardRow = [BoardSymbol, BoardSymbol, BoardSymbol];
-type Board = [BoardRow, BoardRow, BoardRow];
+type BoardSymbol = " " | "X" | "O";
+type BoardRow<T extends string = string> = [T, T, T];
+type Board<T extends string = string> = [BoardRow<T>, BoardRow<T>, BoardRow<T>];
 
 const ROW_COLUMN = [0, 1, 2] as const;
 type CellRowColumn = (typeof ROW_COLUMN)[number];
@@ -18,7 +18,7 @@ type CellRowColumn = (typeof ROW_COLUMN)[number];
 let currentTurn: CurrentTurn = "X";
 let assignedSymbol: PlayerType | null = null;
 let gameStarted = false;
-let board: Board = [
+let board: Board<BoardSymbol> = [
   [" ", " ", " "],
   [" ", " ", " "],
   [" ", " ", " "],
@@ -32,6 +32,16 @@ const rl = createInterface({ input: process.stdin, output: process.stdout });
 // ==========================================
 // GAME LOGIC HELPERS
 // ==========================================
+function printBoard(board: Board): void {
+  console.log(`   +---+---+---+`);
+  console.log(`   | ${board[0][0]} | ${board[0][1]} | ${board[0][2]} |`);
+  console.log(`   +---+---+---+`);
+  console.log(`   | ${board[1][0]} | ${board[1][1]} | ${board[1][2]} |`);
+  console.log(`   +---+---+---+`);
+  console.log(`   | ${board[2][0]} | ${board[2][1]} | ${board[2][2]} |`);
+  console.log(`   +---+---+---+\n`);
+}
+
 function drawBoard() {
   console.clear();
 
@@ -50,8 +60,11 @@ function drawBoard() {
   // Create a display representation of the board
   const displayBoard = board.map((row) => [...row]) as Board;
 
-  // If the user is an active player, inject position numbers into empty spots
-  if (assignedSymbol === "X" || assignedSymbol === "O") {
+  // Only show numbers if the game is active, it's your turn, and the game isn't over
+  const isMyTurn = gameStarted && assignedSymbol === currentTurn;
+  const isGameOver = checkGameOver() !== null;
+
+  if (isMyTurn && !isGameOver) {
     for (const r of ROW_COLUMN) {
       for (const c of ROW_COLUMN) {
         if (displayBoard[r][c] === " ") {
@@ -62,22 +75,12 @@ function drawBoard() {
     }
   }
 
-  console.log(`   +---+---+---+`);
-  console.log(
-    `   | ${displayBoard[0][0]} | ${displayBoard[0][1]} | ${displayBoard[0][2]} |`,
-  );
-  console.log(`   +---+---+---+`);
-  console.log(
-    `   | ${displayBoard[1][0]} | ${displayBoard[1][1]} | ${displayBoard[1][2]} |`,
-  );
-  console.log(`   +---+---+---+`);
-  console.log(
-    `   | ${displayBoard[2][0]} | ${displayBoard[2][1]} | ${displayBoard[2][2]} |`,
-  );
-  console.log(`   +---+---+---+\n`);
+  printBoard(displayBoard);
 }
 
-function checkGameOver() {
+type GameOverResult = "X" | "O" | "draw" | null;
+
+function checkGameOver(): GameOverResult {
   for (const i of ROW_COLUMN) {
     if (
       board[i][0] !== " " &&
