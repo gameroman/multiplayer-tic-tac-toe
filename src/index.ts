@@ -1,9 +1,21 @@
 import dgram from "node:dgram";
 import { createInterface } from "node:readline";
 
-const WS_PORT = 3000;
-const UDP_PORT = 3001;
-const BROADCAST_ADDR = "255.255.255.255";
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      readonly WS_PORT?: string;
+      readonly UDP_PORT?: string;
+      readonly TEST_BROADCAST_ADDR?: string;
+    }
+  }
+}
+
+const WS_PORT = process.env.WS_PORT ? parseInt(process.env.WS_PORT, 10) : 3000;
+const UDP_PORT = process.env.UDP_PORT
+  ? parseInt(process.env.UDP_PORT, 10)
+  : 3001;
+const BROADCAST_ADDR = process.env.TEST_BROADCAST_ADDR || "255.255.255.255";
 
 type CurrentTurn = "X" | "O";
 type PlayerType = CurrentTurn | "SPECTATOR";
@@ -32,6 +44,12 @@ const rl = createInterface({ input: process.stdin, output: process.stdout });
 // ==========================================
 // GAME LOGIC HELPERS
 // ==========================================
+function clearConsole() {
+  if (process.env.NODE_ENV !== "test") {
+    console.clear();
+  }
+}
+
 function printBoard(board: Board): void {
   console.log(`   +---+---+---+`);
   console.log(`   | ${board[0][0]} | ${board[0][1]} | ${board[0][2]} |`);
@@ -43,7 +61,7 @@ function printBoard(board: Board): void {
 }
 
 function drawBoard() {
-  console.clear();
+  clearConsole();
 
   if (assignedSymbol === "SPECTATOR") {
     console.log(`\n  You are:        [📺 SPECTATOR]`);
@@ -352,7 +370,7 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
 
     if (data.type === "ERROR") {
       cleanupSpectatorInput();
-      console.clear();
+      clearConsole();
       console.log(`\n❌ ${data.message}`);
       socket.close();
       // Gracefully recycle player loop parameters back to local selection
@@ -414,7 +432,7 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
 // UI / MAIN MENU
 // ==========================================
 function showMainMenu() {
-  console.clear();
+  clearConsole();
   console.log("=== MULTIPLAYER TIC-TAC-TOE ===");
   console.log("1. Host a new game");
   console.log("2. Search and join an existing game");

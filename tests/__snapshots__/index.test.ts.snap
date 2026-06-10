@@ -1,0 +1,344 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 1`] = `
+"[Choose an option (1-3):]
+
+=== MULTIPLAYER TIC-TAC-TOE ===
+1. Host a new game
+2. Search and join an existing game
+3. Exit
+
+Choose an option (1-3):"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 2`] = `
+"[Room active.]
+
+ 
+Setting up the game room...
+Room active."
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 3`] = `
+"[Choose an option (1-3):]
+
+=== MULTIPLAYER TIC-TAC-TOE ===
+1. Host a new game
+2. Search and join an existing game
+3. Exit
+
+Choose an option (1-3):"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 4`] = `
+"[Would you like to join this game? (y/n):]
+
+ 
+Searching local network for active games...
+Found a game room at IP: 127.0.0.1!
+Would you like to join this game? (y/n):"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 5`] = `
+"[Your move! Enter a position (1-9):]
+
+ Broadcasting availability to LAN...
+
+  You are Player: [X]
+  Status:         [Waiting for opponent to join...]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+
+  You are Player: [X]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | 1 | 2 | 3 |
+   +---+---+---+
+   | 4 | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9):"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 6`] = `
+"[Waiting for opponent's move...]
+
+ 
+  You are Player: [X]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | 1 | 2 | 3 |
+   +---+---+---+
+   | 4 | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9): 
+  You are Player: [X]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move..."
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 7`] = `
+"[Your move! Enter a position (1-9):]
+
+ 
+  You are Player: [O]
+  Status:         [Waiting for opponent to join...]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+
+  You are Player: [O]
+  Current Turn:   [X]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+
+  You are Player: [O]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | 2 | 3 |
+   +---+---+---+
+   | 4 | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9):"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 8`] = `
+"[Your move! Enter a position (1-9):]
+
+
+
+  You are Player: [X]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+
+  You are Player: [X]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X | 2 | 3 |
+   +---+---+---+
+   | O | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9):"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 9`] = `
+"[Waiting for opponent's move...]
+
+ 
+  You are Player: [O]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X |   |   |
+   +---+---+---+
+   | O |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move..."
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 10`] = `
+"[Waiting for opponent's move...]
+
+ 
+  You are Player: [X]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X |   |
+   +---+---+---+
+   | O |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move..."
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 11`] = `
+"[Your move! Enter a position (1-9):]
+
+
+
+  You are Player: [O]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X |   |   |
+   +---+---+---+
+   | O |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+
+  You are Player: [O]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X | 3 |
+   +---+---+---+
+   | O | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9):"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 12`] = `
+"[Your move! Enter a position (1-9):]
+
+
+
+  You are Player: [X]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X |   |
+   +---+---+---+
+   | O |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+
+  You are Player: [X]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X | X | 3 |
+   +---+---+---+
+   | O | O | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9):"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 13`] = `
+"[Waiting for opponent's move...]
+
+ 
+  You are Player: [O]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X | X |   |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move..."
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 14`] = `
+"[Player X wins! 🎉]
+
+ 
+  You are Player: [X]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X | X |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Game Over! Player X wins! 🎉"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite Full Game Loop: Player X Wins over LAN 15`] = `
+"[Player X wins! 🎉]
+
+
+
+  You are Player: [O]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X | X |   |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+
+  You are Player: [O]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X | X |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Game Over! Player X wins! 🎉"
+`;
