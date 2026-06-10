@@ -17,8 +17,10 @@ const UDP_PORT = process.env.UDP_PORT
   : 3001;
 const BROADCAST_ADDR = process.env.TEST_BROADCAST_ADDR || "255.255.255.255";
 
+const IS_TEST = process.env.NODE_ENV === "test";
+
 type CurrentTurn = "X" | "O";
-type PlayerType = CurrentTurn | "SPECTATOR";
+type PlayerRole = CurrentTurn | "SPECTATOR";
 
 type BoardSymbol = " " | "X" | "O";
 type BoardRow<T extends string = string> = [T, T, T];
@@ -28,16 +30,14 @@ const ROW_COLUMN = [0, 1, 2] as const;
 type CellRowColumn = (typeof ROW_COLUMN)[number];
 
 let currentTurn: CurrentTurn = "X";
-let assignedSymbol: PlayerType | null = null;
+let assignedPlayerRole: PlayerRole | null = null;
 let gameStarted = false;
+let isHost = false;
 let board: Board<BoardSymbol> = [
   [" ", " ", " "],
   [" ", " ", " "],
   [" ", " ", " "],
 ];
-
-// Track active players/spectators to assign roles reliably
-let connectedPlayers: Bun.ServerWebSocket<undefined>[] = [];
 
 const rl = createInterface({ input: process.stdin, output: process.stdout });
 
@@ -45,41 +45,53 @@ const rl = createInterface({ input: process.stdin, output: process.stdout });
 // GAME LOGIC HELPERS
 // ==========================================
 function clearConsole() {
-  if (process.env.NODE_ENV !== "test") {
+  if (IS_TEST) {
+    console.log("🧼");
+  } else {
     console.clear();
   }
 }
 
+function writeDebug(text: string) {
+  if (IS_TEST) {
+    writeConsole(text);
+  }
+}
+
+function writeConsole(text: string) {
+  console.log(text);
+}
+
 function printBoard(board: Board): void {
-  console.log(`   +---+---+---+`);
-  console.log(`   | ${board[0][0]} | ${board[0][1]} | ${board[0][2]} |`);
-  console.log(`   +---+---+---+`);
-  console.log(`   | ${board[1][0]} | ${board[1][1]} | ${board[1][2]} |`);
-  console.log(`   +---+---+---+`);
-  console.log(`   | ${board[2][0]} | ${board[2][1]} | ${board[2][2]} |`);
-  console.log(`   +---+---+---+\n`);
+  writeConsole(`   +---+---+---+`);
+  writeConsole(`   | ${board[0][0]} | ${board[0][1]} | ${board[0][2]} |`);
+  writeConsole(`   +---+---+---+`);
+  writeConsole(`   | ${board[1][0]} | ${board[1][1]} | ${board[1][2]} |`);
+  writeConsole(`   +---+---+---+`);
+  writeConsole(`   | ${board[2][0]} | ${board[2][1]} | ${board[2][2]} |`);
+  writeConsole(`   +---+---+---+\n`);
 }
 
 function drawBoard() {
   clearConsole();
 
-  if (assignedSymbol === "SPECTATOR") {
-    console.log(`\n  You are:        [📺 SPECTATOR]`);
+  if (assignedPlayerRole === "SPECTATOR") {
+    writeConsole(`\n  You are:        [📺 SPECTATOR]`);
   } else {
-    console.log(`\n  You are Player: [${assignedSymbol}]`);
+    writeConsole(`\n  You are Player: [${assignedPlayerRole}]`);
   }
 
   if (!gameStarted) {
-    console.log(`  Status:         [Waiting for opponent to join...]\n`);
+    writeConsole(`  Status:         [Waiting for opponent to join...]\n`);
   } else {
-    console.log(`  Current Turn:   [${currentTurn}]\n`);
+    writeConsole(`  Current Turn:   [${currentTurn}]\n`);
   }
 
   // Create a display representation of the board
   const displayBoard = board.map((row) => [...row]) as Board;
 
   // Only show numbers if the game is active, it's your turn, and the game isn't over
-  const isMyTurn = gameStarted && assignedSymbol === currentTurn;
+  const isMyTurn = gameStarted && assignedPlayerRole === currentTurn;
   const isGameOver = checkGameOver() !== null;
 
   if (isMyTurn && !isGameOver) {
@@ -132,8 +144,8 @@ function checkGameOver(): GameOverResult {
 function promptMove(ws: WebSocket) {
   if (!gameStarted) return;
 
-  if (currentTurn !== assignedSymbol) {
-    console.log("Waiting for opponent's move...");
+  if (currentTurn !== assignedPlayerRole) {
+    writeConsole("Waiting for opponent's move...");
     return;
   }
 
@@ -141,7 +153,7 @@ function promptMove(ws: WebSocket) {
     const position = parseInt(input.trim(), 10);
 
     if (isNaN(position) || position < 1 || position > 9) {
-      console.log("Invalid input! Please enter a number between 1 and 9.");
+      writeConsole("Invalid input! Please enter a number between 1 and 9.");
       promptMove(ws);
       return;
     }
@@ -151,12 +163,19 @@ function promptMove(ws: WebSocket) {
     const c = (position - 1) % 3;
 
     if (board[r][c] !== " ") {
-      console.log("That spot is already taken! Try again.");
+      writeConsole("That spot is already taken! Try again.");
       promptMove(ws);
       return;
     }
 
-    ws.send(JSON.stringify({ type: "MOVE", r, c, player: assignedSymbol }));
+    const message = JSON.stringify({
+      type: "MOVE",
+      r,
+      c,
+      player: assignedPlayerRole,
+    });
+    writeDebug(`[WS_SEND:${message}]`);
+    ws.send(message);
   });
 }
 
@@ -164,7 +183,11 @@ function promptMove(ws: WebSocket) {
 // NETWORKING LAYERS
 // ==========================================
 function startHost() {
-  console.log("\nSetting up the game room...");
+  isHost = true;
+  // Track active players/spectators to assign roles reliably
+  let connectedPlayers: Bun.ServerWebSocket<undefined>[] = [];
+
+  writeConsole("\nSetting up the game room...");
 
   const server = Bun.serve({
     port: WS_PORT,
@@ -178,7 +201,7 @@ function startHost() {
         ws.subscribe("game");
         connectedPlayers.push(ws);
 
-        let symbol: PlayerType;
+        let symbol: PlayerRole;
         if (connectedPlayers.length === 1) {
           symbol = "X";
         } else if (connectedPlayers.length === 2) {
@@ -191,7 +214,6 @@ function startHost() {
 
         if (connectedPlayers.length === 2) {
           server.publish("game", JSON.stringify({ type: "START" }));
-          connectedPlayers[0]!.send(JSON.stringify({ type: "START" }));
         } else if (connectedPlayers.length > 2 && gameStarted) {
           // Instantly catch up late spectators to current board environment
           ws.send(JSON.stringify({ type: "START" }));
@@ -199,8 +221,10 @@ function startHost() {
         }
       },
       message(ws, message) {
+        const text = message.toString();
+        writeDebug(`[SERVER_GET:${text}]`);
         try {
-          const data = JSON.parse(message.toString());
+          const data = JSON.parse(text);
           // Security block: Don't let accidental spectators inject layout alterations
           if (data.type === "MOVE" && data.player === "SPECTATOR") {
             return;
@@ -208,6 +232,7 @@ function startHost() {
         } catch {
           return;
         }
+        writeDebug(`[SERVER_PUBLISH:${text}]`);
         server.publish("game", message);
         ws.send(message);
       },
@@ -256,7 +281,7 @@ function startHost() {
     }
   }, 1000);
 
-  console.log("Room active. Broadcasting availability to LAN...");
+  writeConsole("Room active. Broadcasting availability to LAN...");
 
   connectToGame("localhost", () => {
     clearInterval(broadcastInterval);
@@ -272,13 +297,13 @@ function startHost() {
 }
 
 function startClientDiscovery() {
-  console.log("\nSearching local network for active games...");
+  writeConsole("\nSearching local network for active games...");
   const udpSocket = dgram.createSocket("udp4");
   let foundHost = false;
 
   const timeout = setTimeout(() => {
     if (!foundHost) {
-      console.log("No games found on your local network.");
+      writeConsole("No games found on your local network.");
       udpSocket.close();
       showMainMenu();
     }
@@ -290,7 +315,7 @@ function startClientDiscovery() {
       clearTimeout(timeout);
       udpSocket.close();
 
-      console.log(`Found a game room at IP: ${rinfo.address}!`);
+      writeConsole(`Found a game room at IP: ${rinfo.address}!`);
       rl.question("Would you like to join this game? (y/n): ", (answer) => {
         if (answer.toLowerCase().startsWith("y")) {
           connectToGame(rinfo.address);
@@ -309,13 +334,15 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
   let spectatorInputHandler: ((chunk: Buffer) => void) | null = null;
 
   socket.addEventListener("message", (event) => {
-    const data = JSON.parse(event.data.toString());
+    const eventData = event.data.toString();
+    const data = JSON.parse(eventData);
+    writeDebug(`[EVENT_DATA:${eventData}]`);
 
-    if (data.type === "ASSIGN" && !assignedSymbol) {
-      assignedSymbol = data.symbol;
+    if (data.type === "ASSIGN" && !assignedPlayerRole) {
+      assignedPlayerRole = data.symbol;
       drawBoard();
 
-      if (assignedSymbol === "SPECTATOR") {
+      if (assignedPlayerRole === "SPECTATOR") {
         setupSpectatorExit(socket);
       }
     }
@@ -325,10 +352,10 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
       if (onOpponentJoin) onOpponentJoin();
       drawBoard();
 
-      if (assignedSymbol !== "SPECTATOR") {
+      if (assignedPlayerRole !== "SPECTATOR") {
         promptMove(socket);
       } else {
-        console.log(
+        writeConsole(
           "🍿 Watching live match... Press [Q] to leave viewing mode.",
         );
       }
@@ -338,7 +365,9 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
       board = data.board;
       currentTurn = data.currentTurn;
       drawBoard();
-      console.log("🍿 Watching live match... Press [Q] to leave viewing mode.");
+      writeConsole(
+        "🍿 Watching live match... Press [Q] to leave viewing mode.",
+      );
     }
 
     if (data.type === "MOVE") {
@@ -349,7 +378,7 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
       const winner = checkGameOver();
       if (winner) {
         cleanupSpectatorInput();
-        console.log(
+        writeConsole(
           winner === "draw"
             ? "Game Over! It's a tie match."
             : `Game Over! Player ${winner} wins! 🎉`,
@@ -359,10 +388,10 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
         process.exit(0);
       }
 
-      if (assignedSymbol !== "SPECTATOR") {
+      if (assignedPlayerRole !== "SPECTATOR") {
         promptMove(socket);
       } else {
-        console.log(
+        writeConsole(
           "🍿 Watching live match... Press [Q] to leave viewing mode.",
         );
       }
@@ -371,10 +400,10 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
     if (data.type === "ERROR") {
       cleanupSpectatorInput();
       clearConsole();
-      console.log(`\n❌ ${data.message}`);
+      writeConsole(`\n❌ ${data.message}`);
       socket.close();
       // Gracefully recycle player loop parameters back to local selection
-      assignedSymbol = null;
+      assignedPlayerRole = null;
       gameStarted = false;
       board = [
         [" ", " ", " "],
@@ -397,7 +426,7 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
         ws.close();
 
         // Wipe instance indicators before falling back to main screen layout
-        assignedSymbol = null;
+        assignedPlayerRole = null;
         gameStarted = false;
         board = [
           [" ", " ", " "],
@@ -433,10 +462,10 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
 // ==========================================
 function showMainMenu() {
   clearConsole();
-  console.log("=== MULTIPLAYER TIC-TAC-TOE ===");
-  console.log("1. Host a new game");
-  console.log("2. Search and join an existing game");
-  console.log("3. Exit");
+  writeConsole("=== MULTIPLAYER TIC-TAC-TOE ===");
+  writeConsole("1. Host a new game");
+  writeConsole("2. Search and join an existing game");
+  writeConsole("3. Exit");
 
   rl.question("\nChoose an option (1-3): ", (choice) => {
     switch (choice.trim()) {
@@ -449,12 +478,13 @@ function showMainMenu() {
       case "3":
         rl.close();
         process.exit(0);
-        break;
       default:
-        console.log("Invalid choice.");
+        writeConsole("Invalid choice.");
         setTimeout(showMainMenu, 1000);
     }
   });
 }
 
-showMainMenu();
+if (import.meta.main) {
+  showMainMenu();
+}

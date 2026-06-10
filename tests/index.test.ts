@@ -1,11 +1,20 @@
 import { expect, test, describe } from "bun:test";
 
+type Subprocess = Bun.Subprocess<"pipe", "pipe", "inherit">;
+
 class ProcessStreamWatcher {
   private buffer = "";
   private reader: ReadableStreamDefaultReader<Uint8Array>;
+  private name: string;
+  private feed = "";
+  private proc: Subprocess;
 
-  constructor(stream: ReadableStream<Uint8Array>) {
-    this.reader = stream.getReader();
+  private encoder = new TextEncoder();
+
+  constructor(proc: Subprocess, name: string) {
+    this.proc = proc;
+    this.reader = proc.stdout.getReader();
+    this.name = name;
     void this.startReading();
   }
 
@@ -14,7 +23,9 @@ class ProcessStreamWatcher {
     while (true) {
       const { value, done } = await this.reader.read();
       if (done) break;
-      this.buffer += decoder.decode(value, { stream: true });
+      const text = decoder.decode(value, { stream: true });
+      this.buffer += text;
+      this.feed += text;
     }
   }
 
@@ -32,8 +43,18 @@ class ProcessStreamWatcher {
     const matchIndex = this.buffer.indexOf(targetText);
     const matchedSegment = this.buffer.slice(0, matchIndex + targetText.length);
     this.buffer = this.buffer.slice(matchIndex + targetText.length);
-    expect(`[${targetText}]\n\n${matchedSegment}`).toMatchSnapshot();
     return matchedSegment;
+  }
+
+  async write(text: string) {
+    this.feed += `[INPUT:${text}]\n`;
+    const bytes = this.encoder.encode(`${text}\n`);
+    await this.proc.stdin.write(bytes);
+  }
+
+  end() {
+    expect(this.feed).toMatchSnapshot(`[${this.name}]`);
+    this.proc.kill();
   }
 }
 
@@ -44,8 +65,6 @@ const testEnv = {
   UDP_PORT: "3101",
   TEST_BROADCAST_ADDR: "127.255.255.255",
 };
-
-const encoder = new TextEncoder();
 
 describe("Multiplayer Tic-Tac-Toe E2E Suite", () => {
   test("Full Game Loop: Player X Wins over LAN", async () => {
@@ -60,24 +79,24 @@ describe("Multiplayer Tic-Tac-Toe E2E Suite", () => {
       stdout: "pipe",
     });
 
-    const hostLog = new ProcessStreamWatcher(host.stdout);
-    const clientLog = new ProcessStreamWatcher(client.stdout);
+    const hostLog = new ProcessStreamWatcher(host, "host");
+    const clientLog = new ProcessStreamWatcher(client, "client");
 
     // --- INITIAL CONNECTION ---
     await hostLog.waitFor("Choose an option (1-3):");
-    await host.stdin.write(encoder.encode("1\n"));
+    await hostLog.write("1");
     await hostLog.waitFor("Room active.");
 
     await clientLog.waitFor("Choose an option (1-3):");
-    await client.stdin.write(encoder.encode("2\n"));
+    await clientLog.write("2");
 
     await clientLog.waitFor("Would you like to join this game? (y/n):");
-    await client.stdin.write(encoder.encode("y\n"));
+    await clientLog.write("y");
 
     // --- TURN 1: Player X plays Position 1 ---
 
     await hostLog.waitFor("Your move! Enter a position (1-9):");
-    await host.stdin.write(encoder.encode("1\n"));
+    await hostLog.write("1");
 
     // Both nodes must render Turn 1 before we proceed
 
@@ -86,7 +105,7 @@ describe("Multiplayer Tic-Tac-Toe E2E Suite", () => {
     await clientLog.waitFor("Your move! Enter a position (1-9):");
 
     // --- TURN 2: Player O plays Position 4 ---
-    await client.stdin.write(encoder.encode("4\n"));
+    await clientLog.write("4");
 
     // Both nodes must render Turn 2 before we proceed
 
@@ -95,7 +114,7 @@ describe("Multiplayer Tic-Tac-Toe E2E Suite", () => {
     await clientLog.waitFor("Waiting for opponent's move...");
 
     // --- TURN 3: Player X plays Position 2 ---
-    await host.stdin.write(encoder.encode("2\n"));
+    await hostLog.write("2");
 
     // Both nodes must render Turn 3 before we proceed
 
@@ -104,7 +123,7 @@ describe("Multiplayer Tic-Tac-Toe E2E Suite", () => {
     await clientLog.waitFor("Your move! Enter a position (1-9):");
 
     // --- TURN 4: Player O plays Position 5 ---
-    await client.stdin.write(encoder.encode("5\n"));
+    await clientLog.write("5");
 
     // Both nodes must render Turn 4 before we proceed
 
@@ -113,13 +132,13 @@ describe("Multiplayer Tic-Tac-Toe E2E Suite", () => {
     await clientLog.waitFor("Waiting for opponent's move...");
 
     // --- TURN 5: Player X plays Position 3 (WINNING MOVE) ---
-    await host.stdin.write(encoder.encode("3\n"));
+    await hostLog.write("3");
 
     // --- SNAPSHOT ASSERTIONS ---
     await hostLog.waitFor("Player X wins! 🎉");
     await clientLog.waitFor("Player X wins! 🎉");
 
-    host.kill();
-    client.kill();
-  }, 20000);
+    hostLog.end();
+    clientLog.end();
+  });
 });
