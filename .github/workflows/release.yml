@@ -41,7 +41,7 @@ jobs:
       - name: Create release directory
         run: |
           mkdir -p release
-          cp dist/tictactoe release/tictactoe
+          cp dist/tictactoe.exe release/tictactoe.exe
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3
@@ -58,7 +58,7 @@ jobs:
 
             **Built with Bun** | **Windows x64**
           files: |
-            release/tictactoe
+            release/tictactoe.exe
           draft: false
           prerelease: false
         env:
