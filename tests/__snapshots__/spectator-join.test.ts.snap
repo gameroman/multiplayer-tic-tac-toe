@@ -279,20 +279,6 @@ Would you like to join this game? (y/n): [INPUT:y]
    +---+---+---+
 
 [EVENT_DATA:{"type":"START"}]
-🧼
-
-  You are:        [📺 SPECTATOR]
-  Current Turn:   [X]
-
-   +---+---+---+
-   |   |   |   |
-   +---+---+---+
-   |   |   |   |
-   +---+---+---+
-   |   |   |   |
-   +---+---+---+
-
-🍿 Watching live match... Press [Q] to leave viewing mode.
 [EVENT_DATA:{"type":"SYNC_BOARD","board":[[" "," "," "],[" "," "," "],[" "," "," "]],"currentTurn":"X"}]
 🧼
 
