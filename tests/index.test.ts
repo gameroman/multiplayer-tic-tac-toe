@@ -2,19 +2,19 @@ import { expect, test, describe } from "bun:test";
 
 type Subprocess = Bun.Subprocess<"pipe", "pipe", "inherit">;
 
-class ProcessStreamWatcher {
-  private buffer = "";
+class ProcessSession {
+  private pendingBuffer = "";
   private reader: ReadableStreamDefaultReader<Uint8Array>;
-  private name: string;
-  private feed = "";
-  private proc: Subprocess;
+  private sessionName: string;
+  private sessionHistory = "";
+  private process: Subprocess;
 
   private encoder = new TextEncoder();
 
-  constructor(proc: Subprocess, name: string) {
-    this.proc = proc;
-    this.reader = proc.stdout.getReader();
-    this.name = name;
+  constructor(process: Subprocess, sessionName: string) {
+    this.process = process;
+    this.reader = process.stdout.getReader();
+    this.sessionName = sessionName;
     void this.startReading();
   }
 
@@ -24,37 +24,42 @@ class ProcessStreamWatcher {
       const { value, done } = await this.reader.read();
       if (done) break;
       const text = decoder.decode(value, { stream: true });
-      this.buffer += text;
-      this.feed += text;
+      this.pendingBuffer += text;
+      this.sessionHistory += text;
     }
   }
 
-  async waitFor(targetText: string, timeoutMs = 4000): Promise<string> {
-    const start = Date.now();
-    while (!this.buffer.includes(targetText)) {
-      if (Date.now() - start > timeoutMs) {
+  async waitFor(expectedOutput: string, timeoutMs = 4000): Promise<string> {
+    const startTime = Date.now();
+    while (!this.pendingBuffer.includes(expectedOutput)) {
+      if (Date.now() - startTime > timeoutMs) {
         throw new Error(
-          `Timeout waiting for console output phrase: "${targetText}"\nCurrent Buffer State:\n${this.buffer}`,
+          `Timeout waiting for console output phrase: "${expectedOutput}"\nCurrent Buffer State:\n${this.pendingBuffer}`,
         );
       }
       await Bun.sleep(50);
     }
 
-    const matchIndex = this.buffer.indexOf(targetText);
-    const matchedSegment = this.buffer.slice(0, matchIndex + targetText.length);
-    this.buffer = this.buffer.slice(matchIndex + targetText.length);
+    const matchIndex = this.pendingBuffer.indexOf(expectedOutput);
+    const matchedSegment = this.pendingBuffer.slice(
+      0,
+      matchIndex + expectedOutput.length,
+    );
+    this.pendingBuffer = this.pendingBuffer.slice(
+      matchIndex + expectedOutput.length,
+    );
     return matchedSegment;
   }
 
   async write(text: string) {
-    this.feed += `[INPUT:${text}]\n`;
+    this.sessionHistory += `[INPUT:${text}]\n`;
     const bytes = this.encoder.encode(`${text}\n`);
-    await this.proc.stdin.write(bytes);
+    await this.process.stdin.write(bytes);
   }
 
-  end() {
-    expect(this.feed).toMatchSnapshot(`[${this.name}]`);
-    this.proc.kill();
+  assertAndTeardown() {
+    expect(this.sessionHistory).toMatchSnapshot(`[${this.sessionName}]`);
+    this.process.kill();
   }
 }
 
@@ -68,77 +73,68 @@ const testEnv = {
 
 describe("Multiplayer Tic-Tac-Toe E2E Suite", () => {
   test("Full Game Loop: Player X Wins over LAN", async () => {
-    const host = Bun.spawn(["bun", "run", "./src/index.ts"], {
+    const hostProcess = Bun.spawn(["bun", "run", "./src/index.ts"], {
       env: testEnv,
       stdin: "pipe",
       stdout: "pipe",
     });
-    const client = Bun.spawn(["bun", "run", "./src/index.ts"], {
+    const clientProcess = Bun.spawn(["bun", "run", "./src/index.ts"], {
       env: testEnv,
       stdin: "pipe",
       stdout: "pipe",
     });
 
-    const hostLog = new ProcessStreamWatcher(host, "host");
-    const clientLog = new ProcessStreamWatcher(client, "client");
+    const hostSession = new ProcessSession(hostProcess, "host");
+    const clientSession = new ProcessSession(clientProcess, "client");
 
     // --- INITIAL CONNECTION ---
-    await hostLog.waitFor("Choose an option (1-3):");
-    await hostLog.write("1");
-    await hostLog.waitFor("Room active.");
+    await hostSession.waitFor("Choose an option (1-3):");
+    await hostSession.write("1");
+    await hostSession.waitFor("Room active.");
 
-    await clientLog.waitFor("Choose an option (1-3):");
-    await clientLog.write("2");
+    await clientSession.waitFor("Choose an option (1-3):");
+    await clientSession.write("2");
 
-    await clientLog.waitFor("Would you like to join this game? (y/n):");
-    await clientLog.write("y");
+    await clientSession.waitFor("Would you like to join this game? (y/n):");
+    await clientSession.write("y");
 
     // --- TURN 1: Player X plays Position 1 ---
-
-    await hostLog.waitFor("Your move! Enter a position (1-9):");
-    await hostLog.write("1");
+    await hostSession.waitFor("Your move! Enter a position (1-9):");
+    await hostSession.write("1");
 
     // Both nodes must render Turn 1 before we proceed
-
-    await hostLog.waitFor("Waiting for opponent's move...");
-
-    await clientLog.waitFor("Your move! Enter a position (1-9):");
+    await hostSession.waitFor("Waiting for opponent's move...");
+    await clientSession.waitFor("Your move! Enter a position (1-9):");
 
     // --- TURN 2: Player O plays Position 4 ---
-    await clientLog.write("4");
+    await clientSession.write("4");
 
     // Both nodes must render Turn 2 before we proceed
-
-    await hostLog.waitFor("Your move! Enter a position (1-9):");
-
-    await clientLog.waitFor("Waiting for opponent's move...");
+    await hostSession.waitFor("Your move! Enter a position (1-9):");
+    await clientSession.waitFor("Waiting for opponent's move...");
 
     // --- TURN 3: Player X plays Position 2 ---
-    await hostLog.write("2");
+    await hostSession.write("2");
 
     // Both nodes must render Turn 3 before we proceed
-
-    await hostLog.waitFor("Waiting for opponent's move...");
-
-    await clientLog.waitFor("Your move! Enter a position (1-9):");
+    await hostSession.waitFor("Waiting for opponent's move...");
+    await clientSession.waitFor("Your move! Enter a position (1-9):");
 
     // --- TURN 4: Player O plays Position 5 ---
-    await clientLog.write("5");
+    await clientSession.write("5");
 
     // Both nodes must render Turn 4 before we proceed
-
-    await hostLog.waitFor("Your move! Enter a position (1-9):");
-
-    await clientLog.waitFor("Waiting for opponent's move...");
+    await hostSession.waitFor("Your move! Enter a position (1-9):");
+    await clientSession.waitFor("Waiting for opponent's move...");
 
     // --- TURN 5: Player X plays Position 3 (WINNING MOVE) ---
-    await hostLog.write("3");
+    await hostSession.write("3");
 
     // --- SNAPSHOT ASSERTIONS ---
-    await hostLog.waitFor("Player X wins! 🎉");
-    await clientLog.waitFor("Player X wins! 🎉");
+    await hostSession.waitFor("Player X wins! 🎉");
+    await clientSession.waitFor("Player X wins! 🎉");
 
-    hostLog.end();
-    clientLog.end();
+    hostSession.assertAndTeardown();
+    clientSession.assertAndTeardown();
   });
 });
