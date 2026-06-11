@@ -347,14 +347,9 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
     if (data.type === "START") {
       gameStarted = true;
       if (onOpponentJoin) onOpponentJoin();
-      drawBoard();
-
       if (assignedPlayerRole !== "SPECTATOR") {
+        drawBoard();
         promptMove(socket);
-      } else {
-        writeConsole(
-          "🍿 Watching live match... Press [Q] to leave viewing mode.",
-        );
       }
     }
 
@@ -413,8 +408,10 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
   });
 
   function setupSpectatorExit(ws: WebSocket) {
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
+    if (!IS_TEST) {
+      process.stdin.setRawMode(true);
+      process.stdin.resume();
+    }
 
     spectatorInputHandler = (chunk: Buffer) => {
       const key = chunk.toString();
@@ -441,8 +438,10 @@ function connectToGame(ip: string, onOpponentJoin?: () => void) {
   function cleanupSpectatorInput() {
     if (spectatorInputHandler) {
       process.stdin.removeListener("data", spectatorInputHandler);
-      process.stdin.setRawMode(false);
-      process.stdin.pause();
+      if (!IS_TEST) {
+        process.stdin.setRawMode(false);
+        process.stdin.pause();
+      }
       spectatorInputHandler = null;
     }
   }

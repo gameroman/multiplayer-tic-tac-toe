@@ -1,0 +1,387 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite - Spectator Flow Third connected node defaults to a spectator role: [host] 1`] = `
+"🧼
+=== MULTIPLAYER TIC-TAC-TOE ===
+1. Host a new game
+2. Search and join an existing game
+3. Exit
+
+Choose an option (1-3): [INPUT:1]
+
+Setting up the game room...
+Room active. Broadcasting availability to LAN...
+[EVENT_DATA:{"type":"ASSIGN","symbol":"X"}]
+🧼
+
+  You are Player: [X]
+  Status:         [Waiting for opponent to join...]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+[EVENT_DATA:{"type":"START"}]
+🧼
+
+  You are Player: [X]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | 1 | 2 | 3 |
+   +---+---+---+
+   | 4 | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9): [INPUT:1]
+[WS_SEND:{"type":"MOVE","r":0,"c":0,"player":"X"}]
+[SERVER_GET:{"type":"MOVE","r":0,"c":0,"player":"X"}]
+[SERVER_PUBLISH:{"type":"MOVE","r":0,"c":0,"player":"X"}]
+[EVENT_DATA:{"type":"MOVE","r":0,"c":0,"player":"X"}]
+🧼
+
+  You are Player: [X]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+[SERVER_GET:{"type":"MOVE","r":1,"c":0,"player":"O"}]
+[SERVER_PUBLISH:{"type":"MOVE","r":1,"c":0,"player":"O"}]
+[EVENT_DATA:{"type":"MOVE","r":1,"c":0,"player":"O"}]
+🧼
+
+  You are Player: [X]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X | 2 | 3 |
+   +---+---+---+
+   | O | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9): [INPUT:2]
+[WS_SEND:{"type":"MOVE","r":0,"c":1,"player":"X"}]
+[SERVER_GET:{"type":"MOVE","r":0,"c":1,"player":"X"}]
+[SERVER_PUBLISH:{"type":"MOVE","r":0,"c":1,"player":"X"}]
+[EVENT_DATA:{"type":"MOVE","r":0,"c":1,"player":"X"}]
+🧼
+
+  You are Player: [X]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X |   |
+   +---+---+---+
+   | O |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+[SERVER_GET:{"type":"MOVE","r":1,"c":1,"player":"O"}]
+[SERVER_PUBLISH:{"type":"MOVE","r":1,"c":1,"player":"O"}]
+[EVENT_DATA:{"type":"MOVE","r":1,"c":1,"player":"O"}]
+🧼
+
+  You are Player: [X]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X | X | 3 |
+   +---+---+---+
+   | O | O | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9): [INPUT:3]
+[WS_SEND:{"type":"MOVE","r":0,"c":2,"player":"X"}]
+[SERVER_GET:{"type":"MOVE","r":0,"c":2,"player":"X"}]
+[SERVER_PUBLISH:{"type":"MOVE","r":0,"c":2,"player":"X"}]
+[EVENT_DATA:{"type":"MOVE","r":0,"c":2,"player":"X"}]
+🧼
+
+  You are Player: [X]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X | X |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Game Over! Player X wins! 🎉
+"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite - Spectator Flow Third connected node defaults to a spectator role: [client] 1`] = `
+"🧼
+=== MULTIPLAYER TIC-TAC-TOE ===
+1. Host a new game
+2. Search and join an existing game
+3. Exit
+
+Choose an option (1-3): [INPUT:2]
+
+Searching local network for active games...
+Found a game room at IP: 127.0.0.1!
+Would you like to join this game? (y/n): [INPUT:y]
+[EVENT_DATA:{"type":"ASSIGN","symbol":"O"}]
+🧼
+
+  You are Player: [O]
+  Status:         [Waiting for opponent to join...]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+[EVENT_DATA:{"type":"START"}]
+🧼
+
+  You are Player: [O]
+  Current Turn:   [X]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+[EVENT_DATA:{"type":"MOVE","r":0,"c":0,"player":"X"}]
+🧼
+
+  You are Player: [O]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | 2 | 3 |
+   +---+---+---+
+   | 4 | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9): [INPUT:4]
+[WS_SEND:{"type":"MOVE","r":1,"c":0,"player":"O"}]
+[EVENT_DATA:{"type":"MOVE","r":1,"c":0,"player":"O"}]
+🧼
+
+  You are Player: [O]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X |   |   |
+   +---+---+---+
+   | O |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+[EVENT_DATA:{"type":"MOVE","r":0,"c":1,"player":"X"}]
+🧼
+
+  You are Player: [O]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X | 3 |
+   +---+---+---+
+   | O | 5 | 6 |
+   +---+---+---+
+   | 7 | 8 | 9 |
+   +---+---+---+
+
+Your move! Enter a position (1-9): [INPUT:5]
+[WS_SEND:{"type":"MOVE","r":1,"c":1,"player":"O"}]
+[EVENT_DATA:{"type":"MOVE","r":1,"c":1,"player":"O"}]
+🧼
+
+  You are Player: [O]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X | X |   |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Waiting for opponent's move...
+[EVENT_DATA:{"type":"MOVE","r":0,"c":2,"player":"X"}]
+🧼
+
+  You are Player: [O]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X | X |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Game Over! Player X wins! 🎉
+"
+`;
+
+exports[`Multiplayer Tic-Tac-Toe E2E Suite - Spectator Flow Third connected node defaults to a spectator role: [spectator] 1`] = `
+"🧼
+=== MULTIPLAYER TIC-TAC-TOE ===
+1. Host a new game
+2. Search and join an existing game
+3. Exit
+
+Choose an option (1-3): [INPUT:2]
+
+Searching local network for active games...
+Found a game room at IP: 127.0.0.1!
+Would you like to join this game? (y/n): [INPUT:y]
+[EVENT_DATA:{"type":"ASSIGN","symbol":"SPECTATOR"}]
+🧼
+
+  You are:        [📺 SPECTATOR]
+  Status:         [Waiting for opponent to join...]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+[EVENT_DATA:{"type":"START"}]
+🧼
+
+  You are:        [📺 SPECTATOR]
+  Current Turn:   [X]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+🍿 Watching live match... Press [Q] to leave viewing mode.
+[EVENT_DATA:{"type":"SYNC_BOARD","board":[[" "," "," "],[" "," "," "],[" "," "," "]],"currentTurn":"X"}]
+🧼
+
+  You are:        [📺 SPECTATOR]
+  Current Turn:   [X]
+
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+🍿 Watching live match... Press [Q] to leave viewing mode.
+[EVENT_DATA:{"type":"MOVE","r":0,"c":0,"player":"X"}]
+🧼
+
+  You are:        [📺 SPECTATOR]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+🍿 Watching live match... Press [Q] to leave viewing mode.
+[EVENT_DATA:{"type":"MOVE","r":1,"c":0,"player":"O"}]
+🧼
+
+  You are:        [📺 SPECTATOR]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X |   |   |
+   +---+---+---+
+   | O |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+🍿 Watching live match... Press [Q] to leave viewing mode.
+[EVENT_DATA:{"type":"MOVE","r":0,"c":1,"player":"X"}]
+🧼
+
+  You are:        [📺 SPECTATOR]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X |   |
+   +---+---+---+
+   | O |   |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+🍿 Watching live match... Press [Q] to leave viewing mode.
+[EVENT_DATA:{"type":"MOVE","r":1,"c":1,"player":"O"}]
+🧼
+
+  You are:        [📺 SPECTATOR]
+  Current Turn:   [X]
+
+   +---+---+---+
+   | X | X |   |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+🍿 Watching live match... Press [Q] to leave viewing mode.
+[EVENT_DATA:{"type":"MOVE","r":0,"c":2,"player":"X"}]
+🧼
+
+  You are:        [📺 SPECTATOR]
+  Current Turn:   [O]
+
+   +---+---+---+
+   | X | X | X |
+   +---+---+---+
+   | O | O |   |
+   +---+---+---+
+   |   |   |   |
+   +---+---+---+
+
+Game Over! Player X wins! 🎉
+"
+`;
