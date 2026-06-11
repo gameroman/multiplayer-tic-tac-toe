@@ -41,7 +41,7 @@ Room active. Broadcasting availability to LAN...
 
 Your move! Enter a position (1-9): [INPUT:1]
 [WS_SEND:{"type":"MOVE","r":0,"c":0,"player":"X"}]
-[SERVER_GET:[object Object]]
+[SERVER_GET:{"type":"MOVE","r":0,"c":0,"player":"X"}]
 [SERVER_PUBLISH:{"type":"MOVE","r":0,"c":0,"player":"X"}]
 [EVENT_DATA:{"type":"MOVE","r":0,"c":0,"player":"X"}]
 🧼
@@ -58,22 +58,7 @@ Your move! Enter a position (1-9): [INPUT:1]
    +---+---+---+
 
 Waiting for opponent's move...
-[EVENT_DATA:{"type":"MOVE","r":0,"c":0,"player":"X"}]
-🧼
-
-  You are Player: [X]
-  Current Turn:   [O]
-
-   +---+---+---+
-   | X |   |   |
-   +---+---+---+
-   |   |   |   |
-   +---+---+---+
-   |   |   |   |
-   +---+---+---+
-
-Waiting for opponent's move...
-[SERVER_GET:[object Object]]
+[SERVER_GET:{"type":"MOVE","r":1,"c":0,"player":"O"}]
 [SERVER_PUBLISH:{"type":"MOVE","r":1,"c":0,"player":"O"}]
 [EVENT_DATA:{"type":"MOVE","r":1,"c":0,"player":"O"}]
 🧼
@@ -91,7 +76,7 @@ Waiting for opponent's move...
 
 Your move! Enter a position (1-9): [INPUT:2]
 [WS_SEND:{"type":"MOVE","r":0,"c":1,"player":"X"}]
-[SERVER_GET:[object Object]]
+[SERVER_GET:{"type":"MOVE","r":0,"c":1,"player":"X"}]
 [SERVER_PUBLISH:{"type":"MOVE","r":0,"c":1,"player":"X"}]
 [EVENT_DATA:{"type":"MOVE","r":0,"c":1,"player":"X"}]
 🧼
@@ -108,22 +93,7 @@ Your move! Enter a position (1-9): [INPUT:2]
    +---+---+---+
 
 Waiting for opponent's move...
-[EVENT_DATA:{"type":"MOVE","r":0,"c":1,"player":"X"}]
-🧼
-
-  You are Player: [X]
-  Current Turn:   [O]
-
-   +---+---+---+
-   | X | X |   |
-   +---+---+---+
-   | O |   |   |
-   +---+---+---+
-   |   |   |   |
-   +---+---+---+
-
-Waiting for opponent's move...
-[SERVER_GET:[object Object]]
+[SERVER_GET:{"type":"MOVE","r":1,"c":1,"player":"O"}]
 [SERVER_PUBLISH:{"type":"MOVE","r":1,"c":1,"player":"O"}]
 [EVENT_DATA:{"type":"MOVE","r":1,"c":1,"player":"O"}]
 🧼
@@ -141,7 +111,7 @@ Waiting for opponent's move...
 
 Your move! Enter a position (1-9): [INPUT:3]
 [WS_SEND:{"type":"MOVE","r":0,"c":2,"player":"X"}]
-[SERVER_GET:[object Object]]
+[SERVER_GET:{"type":"MOVE","r":0,"c":2,"player":"X"}]
 [SERVER_PUBLISH:{"type":"MOVE","r":0,"c":2,"player":"X"}]
 [EVENT_DATA:{"type":"MOVE","r":0,"c":2,"player":"X"}]
 🧼
@@ -233,21 +203,6 @@ Your move! Enter a position (1-9): [INPUT:4]
    +---+---+---+
 
 Waiting for opponent's move...
-[EVENT_DATA:{"type":"MOVE","r":1,"c":0,"player":"O"}]
-🧼
-
-  You are Player: [O]
-  Current Turn:   [X]
-
-   +---+---+---+
-   | X |   |   |
-   +---+---+---+
-   | O |   |   |
-   +---+---+---+
-   |   |   |   |
-   +---+---+---+
-
-Waiting for opponent's move...
 [EVENT_DATA:{"type":"MOVE","r":0,"c":1,"player":"X"}]
 🧼
 
@@ -264,21 +219,6 @@ Waiting for opponent's move...
 
 Your move! Enter a position (1-9): [INPUT:5]
 [WS_SEND:{"type":"MOVE","r":1,"c":1,"player":"O"}]
-[EVENT_DATA:{"type":"MOVE","r":1,"c":1,"player":"O"}]
-🧼
-
-  You are Player: [O]
-  Current Turn:   [X]
-
-   +---+---+---+
-   | X | X |   |
-   +---+---+---+
-   | O | O |   |
-   +---+---+---+
-   |   |   |   |
-   +---+---+---+
-
-Waiting for opponent's move...
 [EVENT_DATA:{"type":"MOVE","r":1,"c":1,"player":"O"}]
 🧼
 

@@ -32,7 +32,6 @@ type CellRowColumn = (typeof ROW_COLUMN)[number];
 let currentTurn: CurrentTurn = "X";
 let assignedPlayerRole: PlayerRole | null = null;
 let gameStarted = false;
-let isHost = false;
 let board: Board<BoardSymbol> = [
   [" ", " ", " "],
   [" ", " ", " "],
@@ -183,7 +182,6 @@ function promptMove(ws: WebSocket) {
 // NETWORKING LAYERS
 // ==========================================
 function startHost() {
-  isHost = true;
   // Track active players/spectators to assign roles reliably
   let connectedPlayers: Bun.ServerWebSocket<undefined>[] = [];
 
@@ -220,7 +218,7 @@ function startHost() {
           ws.send(JSON.stringify({ type: "SYNC_BOARD", board, currentTurn }));
         }
       },
-      message(ws, message) {
+      message(_ws, message) {
         const text = message.toString();
         writeDebug(`[SERVER_GET:${text}]`);
         try {
@@ -234,7 +232,6 @@ function startHost() {
         }
         writeDebug(`[SERVER_PUBLISH:${text}]`);
         server.publish("game", message);
-        ws.send(message);
       },
       close(ws) {
         const leavingIndex = connectedPlayers.indexOf(ws);
